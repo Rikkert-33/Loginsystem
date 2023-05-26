@@ -16,7 +16,7 @@ var db *sql.DB
 func main() {
 	// Databaseverbinding opzetten
 	var err error
-	db, err = sql.Open("mysql", "rik:SQLR1k@tcp(localhost:3306)/Login system DB")
+	db, err = sql.Open("mysql", "rik:SQLR1k@tcp(localhost:3306)/mijndb")
 	if err != nil {
 		fmt.Println("Fout bij het openen van de database.")
 	}
@@ -50,10 +50,8 @@ func CreateTable() {
 	);`
 	_, err = db.Exec(createTableQuery)
 	if err != nil {
-		fmt.Println("Fout bij het maken van de tabel.")
+		fmt.Println("Fout bij het maken van de tabel.", err)
 	}
-
-	fmt.Println("Tabel 'users' is gemaakt of bestaat al.")
 }
 
 // Lees de gebruikersinvoer en retourneer deze
@@ -80,7 +78,7 @@ func getUserData(inputUsername string) (string, string) {
 	err := row.Scan(&username, &password)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			fmt.Println("Ongeldige gebruikersnaam of wachtwoord.")
+			fmt.Println("Gebruiker niet gevonden.")
 		} else {
 			fmt.Println("Fout bij het ophalen van de gebruikersgegevens.")
 		}
@@ -95,14 +93,15 @@ func passwordControl(inputPassword string, password string) {
 	if inputPassword == password {
 		fmt.Println("Inloggen gelukt!")
 	} else {
-		fmt.Println("Ongeldige gebruikersnaam of wachtwoord.")
+		fmt.Println("Ongeldig wachtwoord.")
 	}
 }
 
+// Controleer de gebruikersnaam
 func usernameControl(inputUsername string, username string) {
 	if inputUsername == username {
 		fmt.Println("Inloggen gelukt!")
 	} else {
-		fmt.Println("Ongeldige gebruikersnaam of wachtwoord.")
+		fmt.Println("Ongeldige gebruikersnaam.")
 	}
 }
