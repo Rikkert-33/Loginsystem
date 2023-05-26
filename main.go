@@ -18,9 +18,11 @@ func main() {
 	var err error
 	db, err = sql.Open("mysql", "rik:SQLR1k@tcp(localhost:3306)/Login system DB")
 	if err != nil {
-		panic(err)
+		fmt.Println("Fout bij het openen van de database.")
 	}
 	defer db.Close()
+	// Tabel maken als deze nog niet bestaat
+	CreateTable()
 
 	// Lees de gebruikersinvoer
 	inputUsername, inputPassword := readInput()
@@ -48,7 +50,7 @@ func CreateTable() {
 	);`
 	_, err = db.Exec(createTableQuery)
 	if err != nil {
-		panic(err)
+		fmt.Println("Fout bij het maken van de tabel.")
 	}
 
 	fmt.Println("Tabel 'users' is gemaakt of bestaat al.")
@@ -80,7 +82,7 @@ func getUserData(inputUsername string) (string, string) {
 		if err == sql.ErrNoRows {
 			fmt.Println("Ongeldige gebruikersnaam of wachtwoord.")
 		} else {
-			panic(err)
+			fmt.Println("Fout bij het ophalen van de gebruikersgegevens.")
 		}
 		return "", ""
 	}
