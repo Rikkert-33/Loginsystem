@@ -113,27 +113,6 @@ func addUser(username, password string) error {
 	return nil
 }
 
-// Query om gebruikersgegevens op te halen en retourneer ze
-// func getUserData(inputUsername string) (inputPassword, string) (string, string) {
-// 	query := "SELECT username, password FROM users WHERE username=?"
-// 	row := db.QueryRow(query, inputUsername, inputPassword)
-
-// 	var username, password string
-// 	err := row.Scan(&username, &password)
-// 	if err != nil {
-// 		if err == sql.ErrNoRows {
-// 			fmt.Println("Gebruiker niet gevonden.")
-// 		} else {
-// 			fmt.Println("Fout bij het ophalen van de gebruikersgegevens.", err)
-// 		}
-// 		return "", ""
-// 	}
-
-// 	fmt.Println("Inloggen gelukt!")
-// 	return username, password
-
-// }
-
 // Controleer de gebruikersnaam en het wachtwoord
 func checkCredentials(username, password string) error {
 	query := "SELECT COUNT(*) FROM users WHERE username=? AND password=?"
