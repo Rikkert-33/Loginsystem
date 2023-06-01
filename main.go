@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -10,14 +11,38 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+type Config struct {
+	DBname string `json:"dbname"`
+	DBuser string `json:"dbuser"`
+	DBpass string `json:"dbpass"`
+	DBhost string `json:"dbhost"`
+	DBport string `json:"dbport"`
+}
+
 var db *sql.DB
 
 func main() {
-	// Databaseverbinding opzetten
-	var err error
-	db, err = sql.Open("mysql", "rik:SQLR1k@tcp(localhost:3306)/mijndb2")
+	//Read the config file
+	file, err := os.Open("config.json")
 	if err != nil {
-		fmt.Println("Fout bij het openen van de database.", err)
+		fmt.Println(err)
+		return
+	}
+	defer file.Close()
+
+	decoder := json.NewDecoder(file)
+	config := Config{}
+	err = decoder.Decode(&config)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// Databaseverbinding opzetten
+	dsn := fmt.Sprintf("%s:%s@/%s", config.DBuser, config.DBpass, config.DBname)
+	db, err = sql.Open("mysql", dsn)
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
 	defer db.Close()
