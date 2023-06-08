@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inlogapplicatie</title>
+</head>
+<body>
+    <h1>Welkom bij de inlogapplicatie!</h1>
+    <p>Wilt u inloggen of registreren?</p>
+    <form action="/login" method="POST">
+        <input type="text" name="username" placeholder="Gebruikersnaam" required><br>
+        <input type="password" name="password" placeholder="Wachtwoord" required><br>
+        <input type="submit" value="Inloggen">
+    </form>
+    <form action="/register" method="POST">
+        <input type="text" name="username" placeholder="Gebruikersnaam" required><br>
+        <input type="password" name="password" placeholder="Wachtwoord" required><br>
+        <input type="submit" value="Registreren">
+    </form>
+</body>
+</html>
