@@ -5,9 +5,12 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -23,16 +26,7 @@ var db *sql.DB
 
 func main() {
 	//Read the config file
-	file, err := os.Open("config.json")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer file.Close()
-
-	decoder := json.NewDecoder(file)
-	config := Config{}
-	err = decoder.Decode(&config)
+	config, err := loadConfig("config.json")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -80,6 +74,70 @@ func main() {
 		fmt.Println("Ongeldige keuze.")
 	}
 
+	// create the gin router
+	router := gin.Default()
+
+	// define the route
+	router.GET("/", indexHandler)
+	router.POST("/login", loginHandler)
+	router.POST("/register", registerHandler)
+
+	// run the server
+	router.Run("localhost:8080")
+
+}
+
+// LoadConfig loads the configuration from a JSON file
+func loadConfig(filename string) (Config, error) {
+	config := Config{}
+
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return config, err
+	}
+
+	err = json.Unmarshal(data, &config)
+	if err != nil {
+		return config, err
+	}
+
+	return config, nil
+}
+
+func indexHandler(c *gin.Context) {
+	c.HTML(http.StatusOK, "index.html", nil)
+}
+
+func loginHandler(c *gin.Context) {
+	username := c.PostForm("username")
+	password := c.PostForm("password")
+
+	// Check the credentials
+	err := checkCredentials(username, password)
+	if err != nil {
+		c.HTML(http.StatusOK, "login.html", gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "success.html", nil)
+}
+
+func registerHandler(c *gin.Context) {
+	username := c.PostForm("username")
+	password := c.PostForm("password")
+
+	// Add the user to the database
+	err := addUser(username, password)
+	if err != nil {
+		c.HTML(http.StatusOK, "register.html", gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "success.html", nil)
 }
 
 func CreateTable() error {
